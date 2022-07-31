@@ -1,7 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
+	"log"
+
 	"github.com/enesusta/bdns/dns"
+	"github.com/enesusta/bdns/model"
+	"github.com/enesusta/bdns/parser"
 	"github.com/enesusta/bdns/udp"
 )
 
@@ -12,9 +18,23 @@ var records = map[string]string{
 }
 
 func main() {
+	content, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	config, err := parser.ParseEntities(content)
+	entities := make(map[string][]model.DnsRecord)
+
+	for _, each := range config {
+		entities[each.Subdomain] = each.Records
+	}
+
+	fmt.Println(entities)
+
 	u := udp.InitializeUdpSocket()
-	entity := dns.Entity{
-		Records: records,
+	entity := dns.DnsConfiguration{
+		Entities: entities,
 	}
 
 	for {

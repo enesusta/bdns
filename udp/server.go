@@ -10,7 +10,7 @@ import (
 const (
 	PORT        = 53
 	PROTOCOL    = "udp"
-	BUFFER_SIZE = uint16(512)
+	BUFFER_SIZE = uint16(2048)
 )
 
 var IP = net.ParseIP("127.0.0.1")
