@@ -10,7 +10,7 @@ import (
 )
 
 type DnsConfiguration struct {
-	Entities map[string][]model.DnsRecord
+	Entities map[string]model.DnsEntity
 }
 
 // for more info: https://datatracker.ietf.org/doc/html/rfc1035
@@ -20,46 +20,29 @@ func ServeDns(u *net.UDPConn, d *DnsConfiguration) {
 }
 
 func (d *DnsConfiguration) serveDNS(u *net.UDPConn, clientAddr net.Addr, request *layers.DNS) {
-	subDomain := request.Questions[0].Name
-	// res := make([]layers.DNSResourceRecord, 10)
+	domain := string(request.Questions[0].Name)
 
-	if dnsRecords, ok := d.Entities[string(subDomain)]; ok {
-		for _, dnsRecord := range dnsRecords {
-			// A, _, _ := net.ParseCIDR(dnsRecord.IP + "/24")
-			name := request.Questions[0].Name
+	r := layers.DNSResourceRecord{}
+	r.Type = layers.DNSTypeA
+	r.Class = layers.DNSClassIN
 
-			r := layers.DNSResourceRecord{}
-			r.Type = layers.DNSTypeCNAME
-			// r.IP = A
-			r.CNAME = []byte(dnsRecord.IP)
-			r.Name = []byte(name)
-			r.Class = layers.DNSClassIN
-			// res = append(res, r)
-			setDnsHeaderWithSingleAnswer(request, r)
-		}
-	}
+	found := d.Entities[domain].Ip
+	ip, _, _ := net.ParseCIDR(found + "/24")
+
+	r.IP = ip
+	r.Name = []byte(domain)
+	r.TTL = 3600
+
+	setDnsHeaderWithSingleAnswer(request, r)
 
 	buf := gopacket.NewSerializeBuffer()
 	opts := gopacket.SerializeOptions{}
-
-	// setDnsHeaderWithSingleAnswer(request, r)
-	// setDnsHeaders(request, res)
 
 	err := request.SerializeTo(buf, opts)
 	if err != nil {
 		panic(err)
 	}
 	u.WriteTo(buf.Bytes(), clientAddr)
-}
-
-func setDnsHeaders(request *layers.DNS, answers []layers.DNSResourceRecord) {
-	request.QR = true
-	request.ANCount = 1
-	request.OpCode = layers.DNSOpCodeNotify
-	request.AA = true
-	request.Answers = answers
-
-	request.ResponseCode = layers.DNSResponseCodeNoErr
 }
 
 func setDnsHeaderWithSingleAnswer(request *layers.DNS, answer layers.DNSResourceRecord) {

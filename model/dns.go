@@ -1,12 +1,7 @@
 package model
 
 type DnsEntity struct {
-	Subdomain string      `json:"sub_domain"`
-	Records   []DnsRecord `json:"records`
-}
-
-type DnsRecord struct {
-	TTL  int    `json:"ttl"`
-	Type string `json:"type"`
-	IP   string `json:"ip"`
+	Domain string `json:"domain"`
+	Ip     string `json:"ip"`
+	TTL    uint16 `json:"ttl"`
 }
