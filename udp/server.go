@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	PORT        = 53
+	PORT        = 8080
 	PROTOCOL    = "udp"
 	BUFFER_SIZE = uint16(2048)
 )
