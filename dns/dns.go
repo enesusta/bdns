@@ -1,6 +1,7 @@
 package dns
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/enesusta/bdns/model"
@@ -25,6 +26,8 @@ func (d *DnsConfiguration) serveDNS(u *net.UDPConn, clientAddr net.Addr, request
 	r := layers.DNSResourceRecord{}
 	r.Type = layers.DNSTypeA
 	r.Class = layers.DNSClassIN
+
+	fmt.Println(d.Entities[domain])
 
 	found := d.Entities[domain].Ip
 	ip, _, _ := net.ParseCIDR(found + "/24")

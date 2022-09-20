@@ -28,7 +28,12 @@ func main() {
 		entities[each.Domain] = each
 	}
 
-	u := udp.InitializeUdpSocket()
+	udpConf := udp.UdpConfiguration{
+		Host: "127.0.0.1",
+		Port: 8080,
+	}
+
+	u := udp.InitializeUdpSocket(&udpConf)
 	entity := dns.DnsConfiguration{
 		Entities: entities,
 	}

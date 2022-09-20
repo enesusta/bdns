@@ -7,18 +7,20 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
+type UdpConfiguration struct {
+	Host string
+	Port int
+}
+
 const (
-	PORT        = 8080
 	PROTOCOL    = "udp"
 	BUFFER_SIZE = uint16(2048)
 )
 
-var IP = net.ParseIP("127.0.0.1")
-
-func InitializeUdpSocket() *net.UDPConn {
+func InitializeUdpSocket(conf *UdpConfiguration) *net.UDPConn {
 	addr := net.UDPAddr{
-		Port: PORT,
-		IP:   IP,
+		Port: conf.Port,
+		IP:   net.ParseIP(conf.Host),
 	}
 
 	sock, _ := net.ListenUDP(PROTOCOL, &addr)
